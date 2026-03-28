@@ -11,6 +11,10 @@ VegiAttacker is a fun IoT/robotics project that lets you control a device (like 
 
 The project is currently under active development, with recent updates focusing on WebRTC integration.
 
+## 🎮 Play Now
+
+**Game URL:** https://athishsreeram.github.io/vegiattacker/
+
 ## Features
 
 - 🌐 **Browser-based control** – No app installation needed.
