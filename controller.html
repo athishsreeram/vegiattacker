@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -9,699 +10,544 @@
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@800;900&display=swap');
+*,*::before,*::after{box-sizing:border-box;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+:root{--y:#ffd700;--g:#00ff87;--cy:#00d4ff;--pk:#ff2d78;--dark:#0d0d1a;}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#0d0d1a;font-family:'Fredoka One',cursive;color:#fff;}
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-:root {
-  --yellow: #ffd700;
-  --green:  #00ff87;
-  --pink:   #ff2d78;
-  --cyan:   #00d4ff;
-  --purple: #a855f7;
-  --orange: #ff6b35;
-  --dark:   #0d0d1a;
-}
-html, body {
-  margin: 0; padding: 0;
-  width: 100%; height: 100%;
-  overflow: hidden;
-  background: #0d0d1a;
-  font-family: 'Fredoka One', cursive;
-  color: #fff;
-}
+/* ── ENTRY SCREEN ── */
+#s-entry{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 40% 30%,#1a1a4e 0%,#0d0d1a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:28px;}
+#s-entry h1{font-size:clamp(26px,7.5vw,48px);color:var(–y);text-shadow:0 0 30px rgba(255,215,0,.7),0 4px 0 rgba(100,60,0,.8);margin:0;text-align:center;}
+.esub{font-size:clamp(13px,3.8vw,17px);color:rgba(255,255,255,.6);text-align:center;}
 
-/* ─── ENTRY SCREEN ─────────────────────────────── */
-#entry-screen {
-  position: fixed; inset: 0; z-index: 100;
-  background: radial-gradient(ellipse at 40% 30%, #1a1a4e 0%, #0d0d1a 100%);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 22px; padding: 28px;
-}
-#entry-screen h1 {
-  font-size: clamp(30px,8vw,52px);
-  color: var(--yellow);
-  text-shadow: 0 0 30px rgba(255,215,0,.7), 0 4px 0 rgba(100,60,0,.8);
-  margin: 0; text-align: center;
-}
-.entry-sub {
-  font-size: clamp(14px,4vw,18px);
-  color: rgba(255,255,255,.65); text-align: center;
-}
-.code-input-wrap {
-  display: flex; flex-direction: column;
-  align-items: center; gap: 12px;
-  width: 100%; max-width: 320px;
-}
-#code-input {
-  width: 100%;
-  background: rgba(255,255,255,.08);
-  border: 3px solid rgba(255,215,0,.4);
-  border-radius: 18px;
-  padding: 14px 20px;
-  font-size: clamp(32px,10vw,48px);
-  font-family: 'Fredoka One', monospace;
-  color: var(--yellow);
-  text-align: center;
-  letter-spacing: 8px;
-  outline: none;
-  text-transform: uppercase;
-  caret-color: var(--yellow);
-}
-#code-input:focus { border-color: var(--yellow); box-shadow: 0 0 24px rgba(255,215,0,.3); }
-#code-input::placeholder { color: rgba(255,215,0,.25); letter-spacing:4px; }
-#connect-btn {
-  width: 100%;
-  background: linear-gradient(145deg,#ff2d78,#a855f7);
-  border: 3px solid rgba(255,255,255,.35);
-  border-radius: 22px; padding: 16px;
-  font-size: clamp(22px,6vw,32px); font-family: 'Fredoka One', cursive;
-  color: #fff; cursor: pointer;
-  box-shadow: 0 7px 0 rgba(100,0,60,.8), 0 10px 28px rgba(255,45,120,.4);
-  transition: transform .08s, box-shadow .08s;
-}
-#connect-btn:active { transform: translateY(4px); box-shadow: 0 3px 0 rgba(100,0,60,.8); }
-#connect-btn:disabled { opacity: .5; }
-.entry-status {
-  font-size: 15px; color: rgba(255,255,255,.55); text-align: center;
-  min-height: 20px;
-}
-.entry-status.err  { color: #ff6b6b; }
-.entry-status.ok   { color: var(--green); }
-.entry-status.busy { color: var(--yellow); }
+/* Name + Avatar picker */
+.id-row{display:flex;align-items:center;gap:12px;width:100%;max-width:320px;}
+#av-btn{background:rgba(255,255,255,.08);border:3px solid rgba(255,255,255,.2);border-radius:18px;width:64px;height:64px;font-size:30px;cursor:pointer;flex-shrink:0;transition:.2s;}
+#av-btn:active{transform:scale(.9);}
+#name-input{flex:1;background:rgba(255,255,255,.08);border:3px solid rgba(255,255,255,.2);border-radius:18px;padding:12px 16px;font-size:clamp(16px,5vw,22px);font-family:‘Fredoka One’,cursive;color:#fff;outline:none;caret-color:var(–y);}
+#name-input:focus{border-color:rgba(255,215,0,.5);}
+#name-input::placeholder{color:rgba(255,255,255,.25);}
 
-/* ─── CONTROLLER SCREEN ─────────────────────────── */
-#ctrl-screen {
-  display: none; flex-direction: column;
-  width: 100%; height: 100dvh;
-  position: relative; overflow: hidden;
-  background: radial-gradient(ellipse at 50% 0%, #1a1a4e 0%, #0d0d1a 70%);
-}
-#ctrl-screen.show { display: flex; }
+/* Avatar picker modal */
+#av-modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;}
+#av-modal.show{display:flex;}
+#av-modal h3{font-size:22px;color:var(–y);margin:0;}
+#av-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;max-width:320px;}
+.av-opt{background:rgba(255,255,255,.08);border:3px solid transparent;border-radius:16px;padding:10px;font-size:clamp(24px,7vw,32px);text-align:center;cursor:pointer;transition:.15s;}
+.av-opt:active{transform:scale(.88);}
+.av-opt.sel{border-color:var(–y);background:rgba(255,215,0,.15);}
+
+.code-row{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:320px;}
+#code-input{width:100%;background:rgba(255,255,255,.08);border:3px solid rgba(255,215,0,.4);border-radius:18px;padding:14px 18px;font-size:clamp(28px,9vw,44px);font-family:‘Fredoka One’,monospace;color:var(–y);text-align:center;letter-spacing:8px;outline:none;text-transform:uppercase;caret-color:var(–y);}
+#code-input:focus{border-color:var(–y);box-shadow:0 0 20px rgba(255,215,0,.25);}
+#code-input::placeholder{color:rgba(255,215,0,.2);}
+#conn-btn{width:100%;background:linear-gradient(145deg,#ff2d78,#a855f7);border:3px solid rgba(255,255,255,.3);border-radius:20px;padding:14px;font-size:clamp(20px,6vw,30px);font-family:‘Fredoka One’,cursive;color:#fff;cursor:pointer;box-shadow:0 7px 0 rgba(100,0,60,.8),0 10px 26px rgba(255,45,120,.4);transition:transform .08s,box-shadow .08s;}
+#conn-btn:active{transform:translateY(4px);box-shadow:0 3px 0 rgba(100,0,60,.8);}
+#conn-btn:disabled{opacity:.5;}
+#estat{font-size:14px;color:rgba(255,255,255,.5);text-align:center;min-height:18px;}
+#estat.err{color:#ff6b6b;} #estat.ok{color:var(–g);} #estat.busy{color:var(–y);}
+
+/* ── LOBBY WAIT ── */
+#s-lobby{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 50% 40%,#1a1a4e 0%,#0d0d1a 100%);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;}
+#s-lobby.show{display:flex;}
+#lob-av{font-size:clamp(48px,14vw,80px);animation:lavFloat 1.5s ease infinite alternate;}
+@keyframes lavFloat{from{transform:scale(1) rotate(-5deg);}to{transform:scale(1.08) rotate(5deg);}}
+#lob-name{font-size:clamp(22px,7vw,40px);text-align:center;}
+#lob-color-bar{width:60px;height:6px;border-radius:3px;margin:-4px 0;}
+#lob-status{font-size:clamp(13px,4vw,18px);color:rgba(255,255,255,.55);text-align:center;}
+#lob-players{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.lp-chip{border-radius:20px;padding:6px 14px;font-size:clamp(13px,4vw,17px);border:2px solid rgba(255,255,255,.25);}
+#lob-room{font-size:13px;color:rgba(255,255,255,.3);letter-spacing:2px;margin-top:4px;}
+
+/* ── CONTROLLER ── */
+#s-ctrl{display:none;flex-direction:column;width:100%;height:100dvh;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,#1a1a4e 0%,#0d0d1a 70%);}
+#s-ctrl.show{display:flex;}
 
 /* Status bar */
-#ctrl-status-bar {
-  height: 44px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 14px;
-  background: rgba(0,0,0,.35);
-  border-bottom: 1px solid rgba(255,255,255,.08);
-}
-.sbar-left { display:flex; align-items:center; gap:8px; font-size:14px; color:rgba(255,255,255,.6); }
-.s-dot { width:9px; height:9px; border-radius:50%; background:var(--green); box-shadow:0 0 7px var(--green); }
-.s-dot.dc { background:#ff4444; box-shadow:0 0 7px #ff4444; }
-#ctrl-score-badge {
-  background: rgba(255,215,0,.15); border:1.5px solid rgba(255,215,0,.3);
-  border-radius:12px; padding:2px 12px;
-  font-size:15px; color:var(--yellow);
-}
-#ctrl-code-badge {
-  font-size:12px; color:rgba(255,255,255,.35); letter-spacing:2px;
-}
+#sbar{height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:rgba(0,0,0,.35);border-bottom:1px solid rgba(255,255,255,.07);}
+.sbar-l{display:flex;align-items:center;gap:7px;font-size:13px;color:rgba(255,255,255,.55);}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(–g);box-shadow:0 0 6px var(–g);}
+.sdot.dc{background:#ff4444;box-shadow:0 0 6px #ff4444;}
+#sbar-score{font-size:14px;padding:2px 11px;border-radius:11px;border:1.5px solid rgba(255,215,0,.3);background:rgba(255,215,0,.1);color:var(–y);}
+#sbar-rank{font-size:12px;color:rgba(255,255,255,.35);}
 
-/* Action area */
-#action-display {
-  flex: 0 0 auto;
-  min-height: 120px;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 10px 16px 6px;
-  position: relative;
-}
-#action-bg-glow {
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 50% 60%, rgba(255,215,0,.12) 0%, transparent 70%);
-  pointer-events: none;
-}
-#curr-action-emoji {
-  font-size: clamp(44px,13vw,72px);
-  display: block; line-height: 1.1;
-  filter: drop-shadow(0 4px 12px rgba(0,0,0,.5));
-  animation: emojiPulse .7s ease infinite alternate;
-}
-@keyframes emojiPulse {
-  from { transform:scale(1); }
-  to   { transform:scale(1.08); }
-}
-#curr-action-word {
-  font-size: clamp(28px,9vw,52px);
-  color: var(--yellow);
-  text-shadow: 0 0 20px rgba(255,215,0,.7), 0 3px 0 rgba(100,60,0,.8);
-  letter-spacing: 2px; line-height: 1.1;
-}
-.action-hint {
-  font-size: clamp(12px,3.5vw,16px);
-  color: rgba(255,255,255,.4); margin-top: 2px;
-  animation: hintBlink 1s ease infinite alternate;
-}
-@keyframes hintBlink { from{opacity:.4;} to{opacity:.9;} }
+/* Action display */
+#act-display{flex:0 0 auto;min-height:clamp(100px,22vh,150px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 16px 4px;position:relative;}
+#act-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 70%,rgba(255,215,0,.1) 0%,transparent 70%);pointer-events:none;}
+#act-emoji{font-size:clamp(40px,12vw,68px);display:block;line-height:1.1;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5));animation:aepulse .7s ease infinite alternate;}
+@keyframes aepulse{from{transform:scale(1);}to{transform:scale(1.08);}}
+#act-word{font-size:clamp(26px,8.5vw,50px);color:var(–y);text-shadow:0 0 20px rgba(255,215,0,.7),0 3px 0 rgba(100,60,0,.8);letter-spacing:2px;line-height:1.1;}
+.act-sub{font-size:clamp(11px,3.2vw,15px);color:rgba(255,255,255,.4);margin-top:1px;animation:subBlink 1s ease infinite alternate;}
+@keyframes subBlink{from{opacity:.4;}to{opacity:.9;}}
 
 /* Timer bar */
-#timer-bar-wrap {
-  padding: 0 20px; flex-shrink: 0;
-}
-#timer-bar-bg {
-  width: 100%; height: 8px; border-radius: 4px;
-  background: rgba(255,255,255,.1); overflow: hidden;
-}
-#timer-bar-fill {
-  height: 100%; width: 100%; border-radius: 4px;
-  background: var(--cyan);
-  transform-origin: left;
-  transition: width .08s linear, background .3s;
-}
+#tbar-wrap{padding:0 18px 2px;flex-shrink:0;}
+#tbar-bg{width:100%;height:7px;border-radius:4px;background:rgba(255,255,255,.09);overflow:hidden;}
+#tbar-fill{height:100%;width:100%;border-radius:4px;background:var(–cy);transform-origin:left;transition:width .08s linear,background .3s;}
 
-/* Divider */
-.divider {
-  height: 1px; margin: 8px 16px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
-  flex-shrink: 0;
-}
+.divider{height:1px;margin:5px 14px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);flex-shrink:0;}
 
 /* Button grid */
-#btn-grid {
-  flex: 1; overflow: hidden;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 9px;
-  padding: 6px 12px 10px;
-}
-
-.act-btn {
-  background: linear-gradient(145deg, var(--ca), var(--cb));
-  border: 3px solid rgba(255,255,255,.3);
-  border-radius: 20px;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 3px; cursor: pointer; position: relative; overflow: hidden;
-  box-shadow: 0 6px 0 var(--cs), 0 8px 18px rgba(0,0,0,.3);
-  transition: transform .06s, box-shadow .06s;
-}
-.act-btn::after {
-  content:''; position:absolute;
-  top:0; left:0; right:0; height:38%;
-  background: rgba(255,255,255,.16);
-  border-radius: 17px 17px 50% 50%;
-}
-.act-btn:active, .act-btn.pressed {
-  transform: translateY(5px) scale(0.94);
-  box-shadow: 0 1px 0 var(--cs), 0 3px 8px rgba(0,0,0,.3);
-}
-.act-btn.is-target {
-  animation: targetGlow .55s ease infinite alternate;
-  border-color: var(--yellow) !important;
-}
-@keyframes targetGlow {
-  from { box-shadow:0 6px 0 var(--cs), 0 0 16px rgba(255,215,0,.4); }
-  to   { box-shadow:0 6px 0 var(--cs), 0 0 36px rgba(255,215,0,.9); }
-}
-.act-btn.correct-flash { animation: correctFlash .4s ease !important; }
-@keyframes correctFlash {
-  0%,100% { transform:scale(1); }
-  40% { transform:scale(1.18) rotate(-4deg); }
-  70% { transform:scale(1.12) rotate(3deg); }
-}
-.act-btn.wrong-shake { animation: wrongShake .35s ease !important; }
-@keyframes wrongShake {
-  0%,100%{transform:translateX(0);}
-  25%{transform:translateX(-7px);}
-  50%{transform:translateX(7px);}
-  75%{transform:translateX(-4px);}
-}
-.btn-e { font-size: clamp(22px,6vw,34px); line-height:1; position:relative; z-index:1; }
-.btn-l { font-size: clamp(9px,2.8vw,14px); color:rgba(255,255,255,.88); position:relative; z-index:1; letter-spacing:.4px; }
+#btn-grid{flex:1;overflow:hidden;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:8px;padding:4px 10px 10px;}
+.abtn{background:linear-gradient(145deg,var(–ca),var(–cb));border:3px solid rgba(255,255,255,.28);border-radius:19px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 6px 0 var(–cs),0 8px 18px rgba(0,0,0,.3);transition:transform .06s,box-shadow .06s;}
+.abtn::after{content:’’;position:absolute;top:0;left:0;right:0;height:38%;background:rgba(255,255,255,.15);border-radius:16px 16px 50% 50%;}
+.abtn:active,.abtn.pressed{transform:translateY(5px) scale(.93);box-shadow:0 1px 0 var(–cs),0 3px 8px rgba(0,0,0,.3);}
+.abtn.tgt{animation:tgtGlow .55s ease infinite alternate;border-color:var(–y) !important;}
+@keyframes tgtGlow{from{box-shadow:0 6px 0 var(–cs),0 0 14px rgba(255,215,0,.4);}to{box-shadow:0 6px 0 var(–cs),0 0 34px rgba(255,215,0,.9);}}
+.abtn.ok{animation:aok .4s ease !important;}
+@keyframes aok{0%,100%{transform:scale(1);}40%{transform:scale(1.2) rotate(-4deg);}70%{transform:scale(1.1) rotate(3deg);}}
+.abtn.bad{animation:abad .35s ease !important;}
+@keyframes abad{0%,100%{transform:translateX(0);}25%{transform:translateX(-7px);}75%{transform:translateX(7px);}}
+.be{font-size:clamp(20px,5.5vw,32px);line-height:1;position:relative;z-index:1;}
+.bl{font-size:clamp(8px,2.6vw,13px);color:rgba(255,255,255,.85);position:relative;z-index:1;letter-spacing:.4px;}
 
 /* Feedback overlay */
-#fb-overlay {
-  position: fixed; inset: 0; z-index: 200;
-  display: flex; align-items: center; justify-content: center;
-  pointer-events: none; opacity: 0;
-  font-size: clamp(40px,12vw,72px);
-  text-shadow: 0 0 30px rgba(255,255,255,.5);
-  font-family: 'Fredoka One', cursive;
-  transition: opacity .15s;
-}
-#fb-overlay.show { opacity: 1; animation: fbOverlay .45s ease; }
-@keyframes fbOverlay {
-  0%   { transform:scale(.5); opacity:0; }
-  60%  { transform:scale(1.1); opacity:1; }
-  100% { transform:scale(1); }
-}
-#fb-overlay.hit  { color: var(--yellow); background:radial-gradient(circle, rgba(255,215,0,.25) 0%, transparent 60%); }
-#fb-overlay.miss { color: #ff6b6b;       background:radial-gradient(circle, rgba(255,80,80,.2) 0%, transparent 60%); }
+#fb-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;font-size:clamp(38px,11vw,68px);font-family:‘Fredoka One’,cursive;transition:opacity .15s;}
+#fb-overlay.show{opacity:1;animation:fbov .45s ease;}
+@keyframes fbov{0%{transform:scale(.5);opacity:0;}60%{transform:scale(1.1);opacity:1;}100%{transform:scale(1);}}
+#fb-overlay.hit{color:var(–y);background:radial-gradient(circle,rgba(255,215,0,.22) 0%,transparent 60%);}
+#fb-overlay.miss{color:#ff6b6b;background:radial-gradient(circle,rgba(255,80,80,.18) 0%,transparent 60%);}
+#fb-overlay.win{color:var(–g);background:radial-gradient(circle,rgba(0,255,135,.22) 0%,transparent 60%);}
 
-/* Disconnected screen */
-#dc-screen {
-  position: fixed; inset: 0; z-index: 150;
-  background: rgba(0,0,0,.88); backdrop-filter: blur(8px);
-  display: none; flex-direction: column;
-  align-items: center; justify-content: center; gap: 18px;
-  padding: 24px;
-}
-#dc-screen.show { display: flex; }
-#dc-screen .dc-msg {
-  font-size: clamp(22px,7vw,38px); color: var(--yellow);
-  text-align: center;
-  text-shadow: 0 0 20px rgba(255,215,0,.5);
-}
-#dc-screen .dc-sub { font-size:clamp(14px,4.5vw,20px); color:rgba(255,255,255,.55); text-align:center; }
-#rejoin-btn {
-  background: linear-gradient(145deg,#ff2d78,#a855f7);
-  border: 3px solid rgba(255,255,255,.3); border-radius:22px;
-  padding: 14px 36px; font-size:clamp(18px,5.5vw,28px);
-  font-family:'Fredoka One',cursive; color:#fff; cursor:pointer;
-  box-shadow: 0 6px 0 rgba(100,0,60,.8);
-  touch-action: manipulation;
-}
-#rejoin-btn:active { transform:translateY(4px); }
+/* Freeze overlay */
+#freeze-overlay{position:fixed;inset:0;z-index:190;background:rgba(0,180,255,.15);backdrop-filter:blur(2px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;pointer-events:none;}
+#freeze-overlay.show{display:flex;}
+#freeze-msg{font-size:clamp(28px,9vw,52px);color:var(–cy);text-shadow:0 0 20px rgba(0,212,255,.8);}
+#freeze-bar-wrap{width:70%;background:rgba(255,255,255,.15);border-radius:4px;height:8px;overflow:hidden;}
+#freeze-bar{height:100%;background:var(–cy);width:100%;transition:width linear;border-radius:4px;}
+
+/* Rank change toast */
+#rank-toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:300;background:rgba(0,0,0,.8);border-radius:16px;padding:6px 18px;font-size:15px;opacity:0;pointer-events:none;}
+#rank-toast.show{animation:rtkIn .4s ease forwards,rtkOut .4s ease 1.8s forwards;}
+@keyframes rtkIn{from{opacity:0;transform:translateX(-50%) translateY(-10px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+@keyframes rtkOut{from{opacity:1;}to{opacity:0;}}
+
+/* Disconnect screen */
+#s-dc{position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;}
+#s-dc.show{display:flex;}
+#s-dc .dm{font-size:clamp(20px,6.5vw,36px);color:var(–y);text-align:center;text-shadow:0 0 18px rgba(255,215,0,.5);}
+#s-dc .ds{font-size:clamp(13px,4vw,18px);color:rgba(255,255,255,.5);text-align:center;}
+#rejoin-btn{background:linear-gradient(145deg,#ff2d78,#a855f7);border:3px solid rgba(255,255,255,.3);border-radius:20px;padding:12px 32px;font-size:clamp(16px,5.5vw,26px);font-family:‘Fredoka One’,cursive;color:#fff;cursor:pointer;box-shadow:0 6px 0 rgba(100,0,60,.8);}
+#rejoin-btn:active{transform:translateY(4px);}
+
+/* Game over on controller */
+#s-end{position:fixed;inset:0;z-index:160;background:rgba(0,0,0,.9);backdrop-filter:blur(10px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;}
+#s-end.show{display:flex;}
+#end-trophy{font-size:clamp(48px,14vw,80px);animation:trophyBob 1.2s ease infinite alternate;}
+@keyframes trophyBob{from{transform:scale(1);}to{transform:scale(1.1) rotate(5deg);}}
+#end-msg{font-size:clamp(22px,7vw,40px);text-align:center;}
+#end-scores{display:flex;flex-direction:column;gap:8px;width:100%;max-width:280px;}
+.esc{display:flex;align-items:center;justify-content:space-between;border-radius:12px;padding:8px 14px;border:2px solid rgba(255,255,255,.2);}
+.esc .ep{font-size:18px;} .esc .en{font-size:14px;opacity:.8;} .esc .es{font-size:18px;}
+#end-back{background:linear-gradient(145deg,#00d4ff,#00ff87);border:3px solid rgba(255,255,255,.35);border-radius:20px;padding:12px 32px;font-size:clamp(16px,5vw,24px);font-family:‘Fredoka One’,cursive;color:#003;cursor:pointer;box-shadow:0 5px 0 rgba(0,80,80,.8);margin-top:4px;}
+#end-back:active{transform:translateY(3px);}
 </style>
+
 </head>
 <body>
 
-<!-- ── ENTRY ── -->
-<div id="entry-screen">
-  <div style="font-size:clamp(40px,12vw,64px)">🎮</div>
-  <h1>Veggie Attack!<br>Controller</h1>
-  <div class="entry-sub">Enter the room code shown on the game screen</div>
+<!-- AVATAR MODAL -->
 
-  <div class="code-input-wrap">
-    <input id="code-input" type="text" maxlength="4"
-           placeholder="AB12" autocomplete="off"
-           autocorrect="off" autocapitalize="characters" spellcheck="false"/>
-    <button id="connect-btn">Connect 🎮</button>
-    <div class="entry-status" id="entry-status"></div>
+<div id="av-modal">
+  <h3>Pick your avatar!</h3>
+  <div id="av-grid"></div>
+</div>
+
+<!-- ENTRY -->
+
+<div id="s-entry">
+  <div style="font-size:clamp(36px,10vw,60px)">🎮</div>
+  <h1>Veggie Attack!<br>Join Game</h1>
+  <div class="esub">Pick your name &amp; avatar first!</div>
+  <div class="id-row">
+    <button id="av-btn">🦊</button>
+    <input id="name-input" type="text" maxlength="12" placeholder="Your name" autocomplete="off" autocorrect="off" spellcheck="false"/>
+  </div>
+  <div class="code-row">
+    <div style="font-size:13px;color:rgba(255,255,255,.4);">Enter room code from the game screen</div>
+    <input id="code-input" type="text" maxlength="4" placeholder="AB12" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"/>
+    <button id="conn-btn">Join Game 🎮</button>
+    <div id="estat"></div>
   </div>
 </div>
 
-<!-- ── CONTROLLER ── -->
-<div id="ctrl-screen">
+<!-- LOBBY WAIT -->
 
-  <!-- Status bar -->
-  <div id="ctrl-status-bar">
-    <div class="sbar-left">
-      <div class="s-dot" id="s-dot"></div>
-      <span id="s-text">Connected</span>
-    </div>
-    <div id="ctrl-code-badge">ROOM: <span id="room-label">····</span></div>
-    <div id="ctrl-score-badge">⭐ <span id="ctrl-score">0</span></div>
+<div id="s-lobby">
+  <div id="lob-av">🦊</div>
+  <div id="lob-name">Player 1</div>
+  <div id="lob-color-bar"></div>
+  <div id="lob-status">Waiting for host to start…</div>
+  <div id="lob-players"></div>
+  <div id="lob-room"></div>
+</div>
+
+<!-- CONTROLLER -->
+
+<div id="s-ctrl">
+  <div id="sbar">
+    <div class="sbar-l"><div class="sdot" id="sdot"></div><span id="sbar-name">Player</span></div>
+    <div id="sbar-rank">#1</div>
+    <div id="sbar-score">⭐ 0</div>
   </div>
-
-  <!-- Current action display -->
-  <div id="action-display">
-    <div id="action-bg-glow"></div>
-    <span id="curr-action-emoji">❓</span>
-    <span id="curr-action-word">Waiting…</span>
-    <span class="action-hint" id="action-hint">Tap the matching button! 👇</span>
+  <div id="act-display">
+    <div id="act-glow"></div>
+    <span id="act-emoji">❓</span>
+    <span id="act-word">Waiting…</span>
+    <span class="act-sub" id="act-sub">Tap the matching button! 👇</span>
   </div>
-
-  <!-- Timer bar -->
-  <div id="timer-bar-wrap">
-    <div id="timer-bar-bg">
-      <div id="timer-bar-fill"></div>
-    </div>
-  </div>
-
+  <div id="tbar-wrap"><div id="tbar-bg"><div id="tbar-fill"></div></div></div>
   <div class="divider"></div>
-
-  <!-- Button grid -->
   <div id="btn-grid"></div>
-
-  <!-- Feedback overlay -->
   <div id="fb-overlay"></div>
-
-  <!-- Disconnected -->
-  <div id="dc-screen">
-    <div class="dc-msg">📺 Game disconnected</div>
-    <div class="dc-sub">The game screen was closed<br>or lost connection.</div>
-    <button id="rejoin-btn" onclick="showEntry()">← Back to Entry</button>
+  <div id="freeze-overlay">
+    <div id="freeze-msg">❄️ FROZEN!</div>
+    <div id="freeze-bar-wrap"><div id="freeze-bar"></div></div>
   </div>
+  <div id="rank-toast"></div>
+</div>
 
+<!-- DISCONNECT -->
+
+<div id="s-dc">
+  <div style="font-size:52px">📺</div>
+  <div class="dm">Game disconnected</div>
+  <div class="ds">The game screen was closed or lost connection.</div>
+  <button id="rejoin-btn" onclick="goEntry()">← Back to Entry</button>
+</div>
+
+<!-- GAME OVER -->
+
+<div id="s-end">
+  <div id="end-trophy">🏆</div>
+  <div id="end-msg">Game Over!</div>
+  <div id="end-scores"></div>
+  <button id="end-back" onclick="goEntry()">← Play Again</button>
 </div>
 
 <script>
-// ════════════════════════════════════════════════════════
-//  ACTIONS DATA (same 12 as game screen)
-// ════════════════════════════════════════════════════════
-const ACTIONS = [
-  { id:'punch', word:'PUNCH!', emoji:'👊', btn:'👊', label:'Punch'  },
-  { id:'smash', word:'SMASH!', emoji:'💥', btn:'💥', label:'Smash'  },
-  { id:'chop',  word:'CHOP!',  emoji:'🪓', btn:'🪓', label:'Chop'   },
-  { id:'stomp', word:'STOMP!', emoji:'👣', btn:'👣', label:'Stomp'  },
-  { id:'kick',  word:'KICK!',  emoji:'🦵', btn:'🦵', label:'Kick'   },
-  { id:'jump',  word:'JUMP!',  emoji:'⬆️', btn:'⬆️', label:'Jump'   },
-  { id:'duck',  word:'DUCK!',  emoji:'⬇️', btn:'⬇️', label:'Duck'   },
-  { id:'block', word:'BLOCK!', emoji:'🛡️', btn:'🛡️', label:'Block'  },
-  { id:'pull',  word:'PULL!',  emoji:'🤏', btn:'🤏', label:'Pull'   },
-  { id:'spin',  word:'SPIN!',  emoji:'🔄', btn:'🔄', label:'Spin'   },
-  { id:'slap',  word:'SLAP!',  emoji:'🖐️', btn:'🖐️', label:'Slap'   },
-  { id:'wave',  word:'WAVE!',  emoji:'👋', btn:'👋', label:'Wave'   },
-];
+// ── AVATARS ──────────────────────────────────────────────
+const AVATARS=['🦊','🐸','🐼','🐯','🦁','🐻','🐨','🐮','🐷','🐔','🐙','🦄','🐲','🦋','🐬','🦊','🦖','🧸','🎃','🤖'];
+let selAvatar='🦊';
 
-const BTN_STYLES = [
-  ['#ff6b35','#cc4400','#7a2200'],
-  ['#ff2d78','#aa0044','#660022'],
-  ['#ffd700','#aa8800','#665500'],
-  ['#a855f7','#6600cc','#330077'],
-  ['#00d4ff','#0088cc','#005580'],
-  ['#00ff87','#00aa55','#006633'],
-  ['#ff9900','#cc6600','#7a3300'],
-  ['#ff55cc','#aa0088','#660055'],
-];
-
-// ════════════════════════════════════════════════════════
-//  AUDIO
-// ════════════════════════════════════════════════════════
-let audioCtx = null;
-function getCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  if (audioCtx.state==='suspended') audioCtx.resume();
-  return audioCtx;
-}
-function beep(type) {
-  try {
-    const ctx=getCtx(); const now=ctx.currentTime;
-    const o=ctx.createOscillator(); const g=ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    if (type==='tap') {
-      o.type='sine'; o.frequency.setValueAtTime(600,now); o.frequency.exponentialRampToValueAtTime(300,now+.08);
-      g.gain.setValueAtTime(.35,now); g.gain.exponentialRampToValueAtTime(.001,now+.1);
-      o.start(); o.stop(now+.1);
-    } else if (type==='hit') {
-      [523,659,784].forEach((fr,i)=>{
-        const oc=ctx.createOscillator(); const gc=ctx.createGain();
-        oc.connect(gc); gc.connect(ctx.destination); oc.type='sine'; oc.frequency.value=fr;
-        gc.gain.setValueAtTime(0,now+i*.04); gc.gain.linearRampToValueAtTime(.3,now+i*.04+.02); gc.gain.exponentialRampToValueAtTime(.001,now+i*.04+.25);
-        oc.start(now+i*.04); oc.stop(now+i*.04+.25);
-      });
-      o.start(); o.stop(now+.01);
-    } else if (type==='miss') {
-      o.type='square'; o.frequency.setValueAtTime(220,now); o.frequency.setValueAtTime(160,now+.1);
-      g.gain.setValueAtTime(.35,now); g.gain.exponentialRampToValueAtTime(.001,now+.25);
-      o.start(); o.stop(now+.25);
-    } else if (type==='connect') {
-      [400,600,800].forEach((fr,i)=>{
-        const oc=ctx.createOscillator(); const gc=ctx.createGain();
-        oc.connect(gc); gc.connect(ctx.destination); oc.type='sine'; oc.frequency.value=fr;
-        gc.gain.setValueAtTime(0,now+i*.07); gc.gain.linearRampToValueAtTime(.25,now+i*.07+.02); gc.gain.exponentialRampToValueAtTime(.001,now+i*.07+.2);
-        oc.start(now+i*.07); oc.stop(now+i*.07+.2);
-      });
-      o.start(); o.stop(now+.01);
-    } else { o.start(); o.stop(now+.01); }
-  } catch(e) {}
-}
-function vibe(p) { try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
-
-// ════════════════════════════════════════════════════════
-//  BUILD BUTTONS
-// ════════════════════════════════════════════════════════
-let currentTargetId = null;
-
-function buildButtons() {
-  const grid = document.getElementById('btn-grid');
-  grid.innerHTML = '';
-  // Shuffle and take 8
-  const shuffled = [...ACTIONS].sort(()=>Math.random()-.5).slice(0,8);
-  // Ensure current target is in there
-  if (currentTargetId && !shuffled.find(a=>a.id===currentTargetId)) {
-    shuffled[Math.floor(Math.random()*8)] = ACTIONS.find(a=>a.id===currentTargetId) || shuffled[0];
-  }
-
-  shuffled.forEach((action,idx)=>{
-    const [ca,cb,cs] = BTN_STYLES[idx % BTN_STYLES.length];
-    const btn = document.createElement('button');
-    btn.className = 'act-btn';
-    btn.id = 'abtn-'+action.id;
-    btn.dataset.id = action.id;
-    btn.style.setProperty('--ca',ca);
-    btn.style.setProperty('--cb',cb);
-    btn.style.setProperty('--cs',cs);
-    btn.innerHTML = `<span class="btn-e">${action.btn}</span><span class="btn-l">${action.label}</span>`;
-
-    btn.addEventListener('touchstart', (e)=>{ e.preventDefault(); onBtnTap(action.id, btn); }, { passive:false });
-    btn.addEventListener('mousedown', ()=>onBtnTap(action.id, btn));
-
-    grid.appendChild(btn);
+// Build avatar grid
+const avGrid=document.getElementById('av-grid');
+AVATARS.forEach(av=>{
+  const d=document.createElement('div');d.className='av-opt'+(av===selAvatar?' sel':'');
+  d.textContent=av;
+  d.addEventListener('click',()=>{
+    selAvatar=av;
+    document.getElementById('av-btn').textContent=av;
+    document.querySelectorAll('.av-opt').forEach(e=>e.classList.remove('sel'));
+    d.classList.add('sel');
+    setTimeout(()=>document.getElementById('av-modal').classList.remove('show'),300);
   });
+  avGrid.appendChild(d);
+});
+document.getElementById('av-btn').addEventListener('click',()=>document.getElementById('av-modal').classList.add('show'));
+document.getElementById('av-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
 
-  highlightTarget();
+// ── ACTIONS DATA ─────────────────────────────────────────
+const ACTIONS=[
+  {id:'punch',word:'PUNCH!',emoji:'👊',btn:'👊',label:'Punch'},
+  {id:'smash',word:'SMASH!',emoji:'💥',btn:'💥',label:'Smash'},
+  {id:'chop', word:'CHOP!', emoji:'🪓',btn:'🪓',label:'Chop'},
+  {id:'stomp',word:'STOMP!',emoji:'👣',btn:'👣',label:'Stomp'},
+  {id:'kick', word:'KICK!', emoji:'🦵',btn:'🦵',label:'Kick'},
+  {id:'jump', word:'JUMP!', emoji:'⬆️',btn:'⬆️',label:'Jump'},
+  {id:'duck', word:'DUCK!', emoji:'⬇️',btn:'⬇️',label:'Duck'},
+  {id:'block',word:'BLOCK!',emoji:'🛡️',btn:'🛡️',label:'Block'},
+  {id:'pull', word:'PULL!', emoji:'🤏',btn:'🤏',label:'Pull'},
+  {id:'spin', word:'SPIN!', emoji:'🔄',btn:'🔄',label:'Spin'},
+  {id:'slap', word:'SLAP!', emoji:'🖐️',btn:'🖐️',label:'Slap'},
+  {id:'wave', word:'WAVE!', emoji:'👋',btn:'👋',label:'Wave'},
+];
+const BSTYLES=[
+  ['#ff6b35','#cc4400','#7a2200'],['#ff2d78','#aa0044','#660022'],
+  ['#ffd700','#aa8800','#665500'],['#a855f7','#6600cc','#330077'],
+  ['#00d4ff','#0088cc','#005580'],['#00ff87','#00aa55','#006633'],
+  ['#ff9900','#cc6600','#7a3300'],['#ff55cc','#aa0088','#660055'],
+];
+
+// ── AUDIO ────────────────────────────────────────────────
+let actx=null;
+function gctx(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();return actx;}
+function beep(t){
+  try{
+    const ctx=gctx(),n=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    if(t==='tap'){o.type='sine';o.frequency.setValueAtTime(550,n);o.frequency.exponentialRampToValueAtTime(280,n+.08);g.gain.setValueAtTime(.3,n);g.gain.exponentialRampToValueAtTime(.001,n+.1);o.start(n);o.stop(n+.1);}
+    else if(t==='hit'){[523,659,784].forEach((f,i)=>{const oc=ctx.createOscillator(),gc=ctx.createGain();oc.connect(gc);gc.connect(ctx.destination);oc.type='sine';oc.frequency.value=f;gc.gain.setValueAtTime(0,n+i*.04);gc.gain.linearRampToValueAtTime(.28,n+i*.04+.02);gc.gain.exponentialRampToValueAtTime(.001,n+i*.04+.25);oc.start(n+i*.04);oc.stop(n+i*.04+.25);});o.start(n);o.stop(n+.01);}
+    else if(t==='win'){[523,659,784,1047].forEach((f,i)=>{const oc=ctx.createOscillator(),gc=ctx.createGain();oc.connect(gc);gc.connect(ctx.destination);oc.type='sine';oc.frequency.value=f;gc.gain.setValueAtTime(0,n+i*.08);gc.gain.linearRampToValueAtTime(.3,n+i*.08+.04);gc.gain.exponentialRampToValueAtTime(.001,n+i*.08+.4);oc.start(n+i*.08);oc.stop(n+i*.08+.4);});o.start(n);o.stop(n+.01);}
+    else if(t==='miss'){o.type='square';o.frequency.setValueAtTime(200,n);o.frequency.setValueAtTime(140,n+.1);g.gain.setValueAtTime(.32,n);g.gain.exponentialRampToValueAtTime(.001,n+.22);o.start(n);o.stop(n+.22);}
+    else if(t==='connect'){[400,600,800].forEach((f,i)=>{const oc=ctx.createOscillator(),gc=ctx.createGain();oc.connect(gc);gc.connect(ctx.destination);oc.type='sine';oc.frequency.value=f;gc.gain.setValueAtTime(0,n+i*.07);gc.gain.linearRampToValueAtTime(.22,n+i*.07+.02);gc.gain.exponentialRampToValueAtTime(.001,n+i*.07+.2);oc.start(n+i*.07);oc.stop(n+i*.07+.2);});o.start(n);o.stop(n+.01);}
+    else{o.start(n);o.stop(n+.01);}
+  }catch(e){}
 }
+function vibe(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}}
 
-function highlightTarget() {
-  document.querySelectorAll('.act-btn').forEach(b=>b.classList.remove('is-target'));
-  if (currentTargetId) {
-    const t = document.getElementById('abtn-'+currentTargetId);
-    if (t) t.classList.add('is-target');
-  }
-}
+// ── STATE ────────────────────────────────────────────────
+let peer=null,conn=null,roomCode='',myCC='',myCH='',myScore=0,myRank=1;
+let currentTargetId=null,isFrozen=false;
+let timerAnim=null,timerStart=0,timerDur=3500;
+let freezeTimer=null;
 
-// ════════════════════════════════════════════════════════
-//  PEERJS SETUP
-// ════════════════════════════════════════════════════════
-let peer = null;
-let conn = null;
-let roomCode = '';
-
-// Auto-fill room code from URL param
-(function checkUrlParam() {
-  const p = new URLSearchParams(window.location.search).get('room');
-  if (p) {
-    document.getElementById('code-input').value = p.toUpperCase();
-    // Auto-connect after slight delay
-    setTimeout(doConnect, 600);
-  }
+// ── AUTO-FILL URL PARAM ──────────────────────────────────
+(()=>{
+  const p=new URLSearchParams(window.location.search).get('room');
+  if(p){document.getElementById('code-input').value=p.toUpperCase();setTimeout(doConnect,700);}
 })();
 
-document.getElementById('connect-btn').addEventListener('click', doConnect);
-document.getElementById('code-input').addEventListener('keydown', (e)=>{
-  if (e.key==='Enter') doConnect();
-});
-document.getElementById('code-input').addEventListener('input', (e)=>{
-  e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
-});
+// ── INPUT HANDLING ───────────────────────────────────────
+document.getElementById('conn-btn').addEventListener('click',doConnect);
+document.getElementById('code-input').addEventListener('keydown',e=>{if(e.key==='Enter')doConnect();});
+document.getElementById('code-input').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');});
+document.getElementById('name-input').addEventListener('input',e=>{e.target.value=e.target.value.slice(0,12);});
 
-function doConnect() {
-  const code = document.getElementById('code-input').value.trim().toUpperCase();
-  if (code.length !== 4) {
-    setEntryStatus('Enter a 4-character room code', 'err');
-    return;
-  }
-  roomCode = code;
-  setEntryStatus('Connecting…', 'busy');
-  document.getElementById('connect-btn').disabled = true;
-
-  // Init peer with random ID
-  const myId = 'CTRL-' + Math.random().toString(36).substr(2,8).toUpperCase();
-
-  if (peer) { try{ peer.destroy(); }catch(e){} }
-  peer = new Peer(myId, {
-    debug: 0,
-    config: {
-      iceServers: [
-        { urls:'stun:stun.l.google.com:19302' },
-        { urls:'stun:stun1.l.google.com:19302' },
-      ]
-    }
+function doConnect(){
+  const code=document.getElementById('code-input').value.trim().toUpperCase();
+  const name=document.getElementById('name-input').value.trim()||'Player';
+  if(code.length!==4){setES('Enter a 4-char room code','err');return;}
+  roomCode=code;
+  setES('Connecting…','busy');
+  document.getElementById('conn-btn').disabled=true;
+  if(peer)try{peer.destroy();}catch(e){}
+  const myId='CTRL-'+Math.random().toString(36).substr(2,8).toUpperCase();
+  peer=new Peer(myId,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}});
+  peer.on('open',()=>{
+    setES('Reaching game…','busy');
+    conn=peer.connect('VEGGIE-'+code,{reliable:true,serialization:'json'});
+    setupConn(conn,name);
   });
-
-  peer.on('open', ()=>{
-    setEntryStatus('Reaching game screen…', 'busy');
-    const targetId = 'VEGGIE-' + roomCode;
-    conn = peer.connect(targetId, { reliable:true, serialization:'json' });
-    setupConn(conn);
-  });
-
-  peer.on('error', (err)=>{
-    console.error('Peer error:', err);
-    setEntryStatus('Connection failed: ' + err.type, 'err');
-    document.getElementById('connect-btn').disabled = false;
-  });
+  peer.on('error',err=>{setES('Failed: '+err.type,'err');document.getElementById('conn-btn').disabled=false;});
 }
 
-function setupConn(c) {
-  c.on('open', ()=>{
-    setEntryStatus('Connected! 🎉', 'ok');
-    beep('connect');
-    vibe([30,20,60]);
-    document.getElementById('room-label').textContent = roomCode;
+function setupConn(c,name){
+  c.on('open',()=>{
+    setES('Connected! 🎉','ok');
+    beep('connect');vibe([30,20,60]);
+    c.send({type:'join',name:name,avatar:selAvatar,id:c.peer});
     setTimeout(()=>{
-      document.getElementById('entry-screen').style.display = 'none';
-      document.getElementById('ctrl-screen').classList.add('show');
-      document.getElementById('s-dot').className = 's-dot';
-      document.getElementById('s-text').textContent = 'Connected · Room '+roomCode;
-      buildButtons();
-    }, 400);
+      document.getElementById('s-entry').style.display='none';
+      showLobby(name,selAvatar);
+    },400);
   });
-
-  c.on('data', (data)=>{
-    if (data.type==='round') {
-      onNewRound(data);
-    } else if (data.type==='feedback') {
-      onFeedback(data);
-    }
-  });
-
-  c.on('close', ()=>{
-    console.log('Game disconnected');
-    conn = null;
-    clearTimerBar();
-    document.getElementById('s-dot').className = 's-dot dc';
-    document.getElementById('s-text').textContent = 'Disconnected';
-    document.getElementById('dc-screen').classList.add('show');
-  });
-
-  c.on('error', (err)=>{
-    console.error('Conn error:', err);
-    document.getElementById('dc-screen').classList.add('show');
-  });
+  c.on('data',onData);
+  c.on('close',()=>{conn=null;showDC();});
+  c.on('error',()=>{conn=null;showDC();});
 }
 
-// ════════════════════════════════════════════════════════
-//  GAME EVENTS
-// ════════════════════════════════════════════════════════
-let timerAnim = null;
-let timerStart = null;
-let timerDuration = 3500;
+function send(m){if(conn&&conn.open)try{conn.send(m);}catch(e){};}
 
-function onNewRound(data) {
-  currentTargetId = data.actionId;
+// ── DATA HANDLER ─────────────────────────────────────────
+function onData(d){
+  if(d.type==='assign'){myCC=d.cc;myCH=d.ch;updateLobbyColor();}
+  else if(d.type==='lobbyState'){updateLobbyPlayers(d.players);}
+  else if(d.type==='countdown'){showLobbyStatus('Get ready! 🔥');}
+  else if(d.type==='go'){showLobbyStatus('GO! 💥');setTimeout(showCtrl,400);}
+  else if(d.type==='lobby'){showLobby(document.getElementById('name-input').value||'Player',selAvatar);}
+  else if(d.type==='round'){onRound(d);}
+  else if(d.type==='result'){onResult(d);}
+  else if(d.type==='miss'){onMiss(d);}
+  else if(d.type==='feedback'){onFeedback(d);}
+  else if(d.type==='freeze'){onFreeze(d.duration);}
+  else if(d.type==='unfreeze'){onUnfreeze();}
+  else if(d.type==='gameover'){onGameOver(d);}
+}
 
-  // Update action display
-  document.getElementById('curr-action-emoji').textContent = data.actionEmoji || '❓';
-  document.getElementById('curr-action-word').textContent  = data.actionWord  || '?';
-  document.getElementById('action-hint').textContent = 'Tap the matching button! 👇';
+// ── LOBBY DISPLAY ────────────────────────────────────────
+function showLobby(name,av){
+  document.getElementById('s-entry').style.display='none';
+  document.getElementById('s-ctrl').classList.remove('show');
+  document.getElementById('s-lobby').classList.add('show');
+  document.getElementById('lob-av').textContent=av;
+  document.getElementById('lob-name').textContent=name;
+  document.getElementById('lob-room').textContent='ROOM: '+roomCode;
+  updateLobbyColor();
+}
+function updateLobbyColor(){
+  if(!myCH)return;
+  document.getElementById('lob-name').style.color=myCH;
+  document.getElementById('lob-color-bar').style.background=myCH;
+}
+function updateLobbyPlayers(players){
+  const w=document.getElementById('lob-players');w.innerHTML='';
+  players.filter(p=>!p.dc).forEach(p=>{
+    const c=document.createElement('div');c.className='lp-chip';
+    c.style.borderColor=p.cc==='c1'?'#ff4444':p.cc==='c2'?'#4488ff':p.cc==='c3'?'#ffcc00':'#cc44ff';
+    c.style.background=(p.cc==='c1'?'#ff4444':p.cc==='c2'?'#4488ff':p.cc==='c3'?'#ffcc00':'#cc44ff')+'22';
+    c.textContent=p.avatar+' '+p.name;
+    w.appendChild(c);
+  });
+  const n=players.filter(p=>!p.dc).length;
+  document.getElementById('lob-status').textContent=n>1?`${n} players in lobby • Waiting for host…`:'Waiting for more players…';
+}
+function showLobbyStatus(t){document.getElementById('lob-status').textContent=t;}
 
+// ── CONTROLLER DISPLAY ───────────────────────────────────
+function showCtrl(){
+  document.getElementById('s-lobby').classList.remove('show');
+  document.getElementById('s-ctrl').classList.add('show');
+  const name=document.getElementById('name-input').value||'Player';
+  document.getElementById('sbar-name').textContent=selAvatar+' '+name;
   buildButtons();
-  startTimerBar(3.5);
 }
 
-function onFeedback(data) {
-  document.getElementById('ctrl-score').textContent = data.score || 0;
-  if (data.result==='hit') {
-    showFbOverlay('🎉 NICE!', 'hit');
-    beep('hit');
-    vibe([30,20,80]);
-    flashScreen('#00ff87');
-  } else if (data.result==='miss' || data.result==='wrong') {
-    showFbOverlay(data.result==='miss'?"⏰ Too slow!":'❌ Wrong!', 'miss');
-    beep('miss');
-    vibe([120,40,120]);
-    flashScreen('#ff4444');
-  }
-  clearTimerBar();
+// ── ROUND ────────────────────────────────────────────────
+function onRound(d){
+  currentTargetId=d.actionId;
+  document.getElementById('act-emoji').textContent=d.actionEmoji||'❓';
+  document.getElementById('act-word').textContent=d.actionWord||'?';
+  document.getElementById('act-sub').textContent='Tap the matching button! 👇';
+  buildButtons();
+  startTBar(3.5);
 }
 
-function onBtnTap(actionId, btn) {
-  beep('tap');
-  vibe(40);
-  btn.classList.add('pressed');
-  setTimeout(()=>btn.classList.remove('pressed'), 120);
-
-  // Send to game screen
-  if (conn && conn.open) {
-    try { conn.send({ type:'action', id:actionId }); } catch(e) {}
-  }
-
-  // Local visual feedback
-  if (actionId === currentTargetId) {
-    btn.classList.add('correct-flash');
-    setTimeout(()=>btn.classList.remove('correct-flash'), 500);
-  } else {
-    btn.classList.add('wrong-shake');
-    setTimeout(()=>btn.classList.remove('wrong-shake'), 400);
+function onResult(d){
+  const iWon=(d.winnerId===conn?.peer);
+  const prevRank=myRank;
+  if(d.scores&&conn)myScore=d.scores[conn.peer]||myScore;
+  document.getElementById('sbar-score').textContent='⭐ '+myScore;
+  stopTBar();
+  if(!iWon){
+    showFB('😅 '+d.winnerAvatar+' '+d.winnerName+' wins!','miss');
+    beep('miss');vibe([80,30,80]);
   }
 }
 
-// ════════════════════════════════════════════════════════
-//  TIMER BAR
-// ════════════════════════════════════════════════════════
-function startTimerBar(seconds) {
-  clearTimerBar();
-  const fill = document.getElementById('timer-bar-fill');
-  fill.style.width = '100%';
-  fill.style.background = 'var(--cyan)';
-  timerDuration = seconds * 1000;
-  timerStart = performance.now();
+function onMiss(d){
+  if(d.scores&&conn)myScore=d.scores[conn.peer]||myScore;
+  document.getElementById('sbar-score').textContent='⭐ '+myScore;
+  stopTBar();
+  showFB('⏰ Nobody wins!','miss');
+  beep('miss');
+}
 
-  function tick(now) {
-    const elapsed = now - timerStart;
-    const ratio = Math.max(0, 1 - elapsed / timerDuration);
-    fill.style.width = (ratio*100) + '%';
-    if (ratio < .35) fill.style.background = '#ff2d78';
-    else if (ratio < .6) fill.style.background = '#ffd700';
-    else fill.style.background = 'var(--cyan)';
-    if (ratio > 0) timerAnim = requestAnimationFrame(tick);
-    else fill.style.width = '0%';
+function onFeedback(d){
+  myScore=d.score||myScore;
+  document.getElementById('sbar-score').textContent='⭐ '+myScore;
+  if(d.result==='win'){showFB('🎉 YOU WIN! +pts','win');beep('hit');vibe([30,20,80]);}
+  else if(d.result==='lose'){/* already handled by onResult */}
+  else if(d.result==='wrong'){showFB('❌ Wrong!','miss');beep('miss');vibe([100,40,100]);}
+  else if(d.result==='miss'){showFB('⏰ Too slow!','miss');beep('miss');}
+}
+
+function onFreeze(ms){
+  isFrozen=true;
+  clearTimeout(freezeTimer);
+  const fo=document.getElementById('freeze-overlay');
+  const fb=document.getElementById('freeze-bar');
+  fo.classList.add('show');
+  fb.style.transition='none';fb.style.width='100%';
+  void fb.offsetWidth;
+  fb.style.transition=`width ${ms}ms linear`;fb.style.width='0%';
+  beep('miss');vibe([200,50,200]);
+  freezeTimer=setTimeout(onUnfreeze,ms);
+}
+function onUnfreeze(){
+  isFrozen=false;
+  document.getElementById('freeze-overlay').classList.remove('show');
+}
+
+function onGameOver(d){
+  beep('win');vibe([50,30,100,30,200]);
+  const iWon=(d.winnerId===conn?.peer);
+  stopTBar();
+  document.getElementById('end-trophy').textContent=iWon?'🏆':'🎖️';
+  document.getElementById('end-msg').innerHTML=iWon?`<span style="color:var(--y)">YOU WIN! 🎉</span>`:`${d.winnerAvatar} <span style="color:var(--g)">${d.winnerName}</span> wins!`;
+  // Build scores
+  const sc=document.getElementById('end-scores');sc.innerHTML='';
+  if(d.scores){
+    Object.entries(d.scores).sort((a,b)=>b[1]-a[1]).forEach(([pid,pts],i)=>{
+      const mine=pid===conn?.peer;
+      const c=document.createElement('div');c.className='esc';
+      if(mine){c.style.borderColor=myCH;c.style.background=myCH+'22';}
+      c.innerHTML=`<span class="ep">${['🥇','🥈','🥉','🎖️'][i]||'🎖️'}</span><span class="en">${mine?'You':'Player'}</span><span class="es">${pts}pts</span>`;
+      sc.appendChild(c);
+    });
   }
-  timerAnim = requestAnimationFrame(tick);
+  document.getElementById('s-end').classList.add('show');
 }
 
-function clearTimerBar() {
-  if (timerAnim) cancelAnimationFrame(timerAnim);
-  timerAnim = null;
-  const fill = document.getElementById('timer-bar-fill');
-  fill.style.width = '100%';
-  fill.style.background = 'var(--cyan)';
+// ── BUTTON TAP ──────────────────────────────────────────
+function onBtnTap(actionId,btn){
+  if(isFrozen)return;
+  beep('tap');vibe(40);
+  btn.classList.add('pressed');setTimeout(()=>btn.classList.remove('pressed'),130);
+  send({type:'action',id:actionId,timestamp:Date.now()});
+  if(actionId===currentTargetId){btn.classList.add('ok');setTimeout(()=>btn.classList.remove('ok'),500);}
+  else{btn.classList.add('bad');setTimeout(()=>btn.classList.remove('bad'),400);}
 }
 
-// ════════════════════════════════════════════════════════
-//  FEEDBACK OVERLAY
-// ════════════════════════════════════════════════════════
-let fbTimer = null;
-function showFbOverlay(msg, type) {
-  const el = document.getElementById('fb-overlay');
-  el.textContent = msg;
-  el.className = 'show ' + type;
-  clearTimeout(fbTimer);
-  fbTimer = setTimeout(()=>{ el.className=''; }, 700);
+// ── BUILD BUTTONS ────────────────────────────────────────
+function buildButtons(){
+  const grid=document.getElementById('btn-grid');grid.innerHTML='';
+  const shuffled=[...ACTIONS].sort(()=>Math.random()-.5).slice(0,8);
+  if(currentTargetId&&!shuffled.find(a=>a.id===currentTargetId)){
+    shuffled[Math.floor(Math.random()*8)]=ACTIONS.find(a=>a.id===currentTargetId)||shuffled[0];
+  }
+  shuffled.forEach((a,i)=>{
+    const [ca,cb,cs]=BSTYLES[i%BSTYLES.length];
+    const btn=document.createElement('button');
+    btn.className='abtn'+(a.id===currentTargetId?' tgt':'');
+    btn.id='b-'+a.id;
+    btn.style.setProperty('--ca',ca);btn.style.setProperty('--cb',cb);btn.style.setProperty('--cs',cs);
+    btn.innerHTML=`<span class="be">${a.btn}</span><span class="bl">${a.label}</span>`;
+    btn.addEventListener('touchstart',e=>{e.preventDefault();onBtnTap(a.id,btn);},{passive:false});
+    btn.addEventListener('mousedown',()=>onBtnTap(a.id,btn));
+    grid.appendChild(btn);
+  });
 }
 
-function flashScreen(color) {
-  document.body.style.background = color;
-  setTimeout(()=>{ document.body.style.background = ''; }, 120);
+// ── TIMER BAR ────────────────────────────────────────────
+function startTBar(secs){
+  stopTBar();
+  const fill=document.getElementById('tbar-fill');fill.style.width='100%';fill.style.background='var(--cy)';
+  timerDur=secs*1000;timerStart=performance.now();
+  function tick(now){
+    const ratio=Math.max(0,1-(now-timerStart)/timerDur);
+    fill.style.width=(ratio*100)+'%';
+    if(ratio<.35)fill.style.background='#ff2d78';else if(ratio<.6)fill.style.background='var(--y)';else fill.style.background='var(--cy)';
+    if(ratio>0)timerAnim=requestAnimationFrame(tick);else fill.style.width='0%';
+  }
+  timerAnim=requestAnimationFrame(tick);
+}
+function stopTBar(){if(timerAnim)cancelAnimationFrame(timerAnim);timerAnim=null;}
+
+// ── FEEDBACK OVERLAY ──────────────────────────────────────
+let fbTm=null;
+function showFB(msg,type){
+  const el=document.getElementById('fb-overlay');
+  el.textContent=msg;el.className='show '+type;
+  clearTimeout(fbTm);fbTm=setTimeout(()=>{el.className='';},900);
+  // Flash bg
+  document.body.style.background=type==='win'?'#003320':type==='hit'?'#332200':'#220008';
+  setTimeout(()=>{document.body.style.background='';},150);
 }
 
-// ════════════════════════════════════════════════════════
-//  NAVIGATION
-// ════════════════════════════════════════════════════════
-function showEntry() {
-  document.getElementById('dc-screen').classList.remove('show');
-  document.getElementById('ctrl-screen').classList.remove('show');
-  document.getElementById('entry-screen').style.display = 'flex';
-  document.getElementById('connect-btn').disabled = false;
-  setEntryStatus('', '');
-  if (peer) { try{ peer.destroy(); }catch(e){} peer=null; }
-  conn = null;
+// ── DISCONNECT / GAME OVER ───────────────────────────────
+function showDC(){document.getElementById('s-dc').classList.add('show');}
+function goEntry(){
+  document.getElementById('s-dc').classList.remove('show');
+  document.getElementById('s-end').classList.remove('show');
+  document.getElementById('s-ctrl').classList.remove('show');
+  document.getElementById('s-lobby').classList.remove('show');
+  document.getElementById('s-entry').style.display='flex';
+  document.getElementById('conn-btn').disabled=false;
+  setES('','');
+  if(peer)try{peer.destroy();}catch(e){}
+  peer=null;conn=null;isFrozen=false;stopTBar();
 }
 
-function setEntryStatus(msg, type) {
-  const el = document.getElementById('entry-status');
-  el.textContent = msg;
-  el.className = 'entry-status ' + type;
-}
+function setES(m,t){const el=document.getElementById('estat');el.textContent=m;el.className=t;}
 
-// Prevent zoom, context menu
-document.addEventListener('contextmenu', e=>e.preventDefault());
-document.addEventListener('touchstart', (e)=>{ if(e.touches.length>1) e.preventDefault(); },{ passive:false });
-
-// Unlock audio on first touch
-document.body.addEventListener('touchstart',()=>{ try{getCtx();}catch(e){} },{ once:true });
-document.body.addEventListener('click',()=>{ try{getCtx();}catch(e){} },{ once:true });
-
-// WakeLock — prevent screen sleep on controller
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator) {
-      await navigator.wakeLock.request('screen');
-    }
-  } catch(e) {}
-}
-requestWakeLock();
+// ── INIT ─────────────────────────────────────────────────
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('touchstart',e=>{if(e.touches.length>1)e.preventDefault();},{passive:false});
+document.body.addEventListener('touchstart',()=>{try{gctx();}catch(e){}},{once:true});
+document.body.addEventListener('click',()=>{try{gctx();}catch(e){}},{once:true});
+async function wakeLock(){try{if('wakeLock' in navigator)await navigator.wakeLock.request('screen');}catch(e){}}
+wakeLock();
 </script>
+
 </body>
 </html>
